@@ -1,0 +1,36 @@
+artifact_path: mlflow-artifacts:/2/models/m-03f1d942c7b343f08a6cdd2117fa0a03/artifacts
+flavors:
+  python_function:
+    artifacts:
+      model:
+        path: artifacts\model
+        uri: model
+      service_clf_nps.py:
+        path: artifacts\service_clf_nps.py
+        uri: service_clf_nps.py
+    cloudpickle_version: 3.1.2
+    code: null
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.10.19
+    streamable: false
+is_signature_from_type_hint: true
+mlflow_version: 3.9.0
+model_id: m-03f1d942c7b343f08a6cdd2117fa0a03
+model_size_bytes: 43001452
+model_uuid: m-03f1d942c7b343f08a6cdd2117fa0a03
+prompts: null
+run_id: 90d0b508ad4847d2bd77719c3527efec
+signature:
+  inputs: '[{"type": "object", "properties": {"params": {"type": "object", "properties":
+    {"predict_type": {"type": "string", "required": true}}, "required": true}, "spectra":
+    {"type": "object", "properties": {"spectra": {"type": "array", "items": {"type":
+    "array", "items": {"type": "double"}}, "required": true}}, "required": true}},
+    "required": true}]'
+  outputs: '[{"type": "string", "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2026-02-23 10:21:53.680531'
