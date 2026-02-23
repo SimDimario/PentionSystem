@@ -1,4 +1,4 @@
-# Pention-System 
+# Pention-System
 
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 ![Python](https://img.shields.io/badge/Python-3.10+-brightgreen)
@@ -28,7 +28,7 @@ Pention-System/
 │
 ├─ ClassificatoreNPS/ # Modelli e script per la classificazione NPS
 ├─ CorrectionDispersion/ # Moduli per la correzione della dispersione simulata
-├─ EmissionSouceLocalization/ # Algoritmi per la localizzazione della sorgente
+├─ EmissionSourceLocalization/ # Algoritmi per la localizzazione della sorgente
 ├─ PentionSystem/ # Applicazione principale e API
 ├─ gaussianPuff/ # Modello di simulazione della dispersione
 ├─ docker-compose.yml # Configurazione Docker per deploy
@@ -36,7 +36,6 @@ Pention-System/
 ├─ .gitattributes
 └─ README.md
 ```
-
 
 ---
 
@@ -58,7 +57,9 @@ Pention-System/
 Il progetto è containerizzato per semplificare l’esecuzione e garantire la riproducibilità.
 
 #### 1. Costruzione e avvio dei container
+
 Dalla root del progetto:
+
 ```bash
 docker-compose up --build
 ```
@@ -66,6 +67,7 @@ docker-compose up --build
 #### 2. Streamlit
 
 Per avviare la dashboard locale:
+
 ```bash
 streamlit run application.py
 ```
