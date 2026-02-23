@@ -1,0 +1,33 @@
+artifact_path: mlflow-artifacts:/1/models/m-ca0dc8aff0de4b5597753cdcea849ce0/artifacts
+flavors:
+  python_function:
+    artifacts:
+      project_folder:
+        path: artifacts\CorrectionDispersion
+        uri: CorrectionDispersion
+    cloudpickle_version: 3.1.2
+    code: null
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.pyfunc.model
+    python_model: python_model.pkl
+    python_version: 3.10.19
+    streamable: false
+is_signature_from_type_hint: true
+mlflow_version: 3.9.0
+model_id: m-ca0dc8aff0de4b5597753cdcea849ce0
+model_size_bytes: 1029218297
+model_uuid: m-ca0dc8aff0de4b5597753cdcea849ce0
+prompts: null
+run_id: 72a527e2f2a54d01889ee2dd47c131f4
+signature:
+  inputs: '[{"type": "object", "properties": {"building_map": {"type": "string", "required":
+    true}, "concentration_map": {"type": "string", "required": true}, "global_features":
+    {"type": "array", "items": {"type": "double"}, "required": false}, "wind_dir":
+    {"type": "array", "items": {"type": "double"}, "required": true}, "wind_speed":
+    {"type": "double", "required": true}}, "required": true}]'
+  outputs: '[{"type": "array", "items": {"type": "double"}, "required": true}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2026-02-23 10:36:41.301423'
