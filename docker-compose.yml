@@ -1,11 +1,21 @@
 services:
-  classificatore_nps:
+
+  # classificatore_nps:
+  #   build:
+  #     context: ./ClassificatoreNPS
+  #   image: clas_nps:latest
+  #   container_name: clas_nps
+  #   ports:
+  #     - "8000:8000"
+  #   restart: unless-stopped
+
+  classificatore_nps_mlflow:
     build:
-      context: ./ClassificatoreNPS
-    image: clas_nps:latest
-    container_name: clas_nps
-    ports:
-      - "8000:8000"
+      context: ./ClassificatoreNPS_image
+    container_name: clas_nps_mlflow
+    hostname: classificatore_nps_mlflow
+    environment:
+      - MLFLOW_MODELS_WORKERS=1
     restart: unless-stopped
 
   correction_dispersion:
@@ -19,6 +29,17 @@ services:
     volumes:
       - simulation_data:/tmp
 
+  correction_dispersion_mlflow:
+    build:
+      context: ./CorrectionDispersion_image
+    container_name: correction_dispersion_mlflow
+    hostname: correction_dispersion_mlflow
+    environment:
+      - MLFLOW_MODELS_WORKERS=1
+    volumes:
+      - simulation_data:/simulation_data
+    restart: unless-stopped
+
   gaussian_puff:
     build:
       context: ./gaussianPuff
@@ -28,13 +49,22 @@ services:
       - "8002:8002"
     restart: unless-stopped
 
-  source_localization:
+  # source_localization:
+  #   build:
+  #     context: ./EmissionSourceLocalization
+  #   image: loc_emission_source:latest
+  #   container_name: loc_emission_source
+  #   ports:
+  #     - "8003:8003"
+  #   restart: unless-stopped
+
+  source_localization_mlflow:
     build:
-      context: ./EmissionSouceLocalization
-    image: loc_emission_source:latest
-    container_name: loc_emission_source
-    ports:
-      - "8003:8003"
+      context: ./EmissionSourceLocalization_image
+    container_name: loc_emission_source_mlflow
+    hostname: loc_emission_source_mlflow
+    environment:
+      - MLFLOW_MODELS_WORKERS=1
     restart: unless-stopped
 
   pention_system:
@@ -53,4 +83,3 @@ services:
 
 volumes:
   simulation_data:
-
