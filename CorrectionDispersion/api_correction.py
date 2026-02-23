@@ -6,12 +6,13 @@ import json
 import os
 import sys
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..")))
 from CorrectionDispersion.binary_map_gen import generate_binary_map, convert_np
 from CorrectionDispersion.service_correction import correct_dispersion
 import uvicorn
 
 app = FastAPI()
+
 
 class BBox(BaseModel):
     min_lon: float
@@ -21,6 +22,7 @@ class BBox(BaseModel):
     grid_size: int = 300
     place: str = "Roma, Italy"
 
+
 class DispersionInput(BaseModel):
     wind_speed: float
     wind_dir: list
@@ -28,15 +30,14 @@ class DispersionInput(BaseModel):
     building_map: str
     global_features: list | None = None
 
+
 @app.post("/generate_binary_map")
 def generate_map(bbox: BBox):
 
     quartiere_bbox = (bbox.min_lon, bbox.min_lat, bbox.max_lon, bbox.max_lat)
 
     binary_map, metadata = generate_binary_map(
-        place=bbox.place,
-        bbox=quartiere_bbox,
-        grid_size=bbox.grid_size
+        place=bbox.place, bbox=quartiere_bbox, grid_size=bbox.grid_size
     )
 
     out_dir = "binary_maps_data"
@@ -52,24 +53,25 @@ def generate_map(bbox: BBox):
     return {
         "status_code": "success",
         "map": binary_map.tolist(),
-        "metadata": convert_np(metadata)
+        "metadata": convert_np(metadata),
     }
 
-@app.post("/correct_dispersion")
-def predict_endpoint(payload: DispersionInput):
 
-    conc_map = np.load(payload.concentration_map)
-    build_map = np.load(payload.building_map)
-    glob_feat = np.array(payload.global_features, dtype=np.float32) if payload.global_features else None
+# @app.post("/correct_dispersion")
+# def predict_endpoint(payload: DispersionInput):
+
+#     conc_map = np.load(payload.concentration_map)
+#     build_map = np.load(payload.building_map)
+#     glob_feat = np.array(payload.global_features, dtype=np.float32) if payload.global_features else None
 
 
-    correction_map = correct_dispersion(payload.wind_dir, payload.wind_speed, conc_map, build_map, glob_feat)
-    # esempio, garantisco array regolare
-   # max_len = max(len(row) for row in correction_map)
-   # regular_map = [row + [0] * (max_len - len(row)) if len(row) < max_len else row for row in correction_map]
-    #correction_map = np.array(regular_map, dtype=np.float32)
+#     correction_map = correct_dispersion(payload.wind_dir, payload.wind_speed, conc_map, build_map, glob_feat)
+#     # esempio, garantisco array regolare
+#    # max_len = max(len(row) for row in correction_map)
+#    # regular_map = [row + [0] * (max_len - len(row)) if len(row) < max_len else row for row in correction_map]
+#     #correction_map = np.array(regular_map, dtype=np.float32)
 
-    return {"status_code": "success", "predictions": correction_map.tolist()}
+#     return {"status_code": "success", "predictions": correction_map.tolist()}
 
 """
 if __name__ == "__main__":
