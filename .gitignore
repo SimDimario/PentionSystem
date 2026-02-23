@@ -208,3 +208,9 @@ __marimo__/
 
 #CorrectionDispersion/dataset/real_dispersion
 #CorrectionDispersion/models
+
+.idea
+.venv*
+mlflow.db
+mlartifacts
+CorrectionDispersion/CorrectionDispersion
