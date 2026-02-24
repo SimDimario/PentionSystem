@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 from typing import List
+from auth import verify_token
 import os
 import sys
 import logging
@@ -32,7 +33,7 @@ class PredictRequest(BaseModel):
 app = FastAPI()
 
 @app.post("/predict_source_raw")
-def predict_source_raw(request: PredictRequest):
+def predict_source_raw(request: PredictRequest,user=Depends(verify_token)):
     logger.info(f"Ricevuta richiesta /predict_source_raw con {len(request.payload_sensors)} record")
 
     try:

@@ -7,6 +7,12 @@ services:
     ports:
       - "8000:8000"
     restart: unless-stopped
+    environment:
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+    networks:
+      - internal
+
 
   correction_dispersion:
     build:
@@ -18,6 +24,12 @@ services:
     restart: unless-stopped
     volumes:
       - simulation_data:/tmp
+    environment:
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+    networks:
+      - internal
+
 
   gaussian_puff:
     build:
@@ -27,6 +39,11 @@ services:
     ports:
       - "8002:8002"
     restart: unless-stopped
+    environment:
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+    networks:
+      - internal
 
   source_localization:
     build:
@@ -36,6 +53,11 @@ services:
     ports:
       - "8003:8003"
     restart: unless-stopped
+    environment:
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+    networks:
+      - internal
 
   pention_system:
     build:
@@ -50,7 +72,59 @@ services:
     restart: "no"
     volumes:
       - simulation_data:/tmp
+    environment:
+      KEYCLOAK_URL: http://keycloak:8080
+      KEYCLOAK_URL_PUBLIC: http://localhost:8090
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM}
+      KEYCLOAK_CLIENT_ID: pention-frontend
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+      NPS_URL: http://clas_nps:8000
+      DISPERSION_URL: http://correction_dispersion:8001
+      GAUSSIAN_URL: http://gaussian_dispersion_model:8002
+      LOCALIZATION_URL: http://loc_emission_source:8003
+    networks:
+      - internal
+
+  postgres_keycloak:
+    image: postgres:15
+    container_name: postgres_keycloak
+    environment:
+      POSTGRES_DB: ${KC_DB_NAME}
+      POSTGRES_USER: ${KC_DB_USER}
+      POSTGRES_PASSWORD: ${KC_DB_PASSWORD}
+    volumes:
+      - keycloak_db:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - internal
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: keycloak
+    command: start-dev
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres_keycloak:5432/${KC_DB_NAME}
+      KC_DB_USERNAME: ${KC_DB_USER}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      KEYCLOAK_ADMIN: ${KC_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KC_ADMIN_PASSWORD}
+      KC_HTTP_PORT: 8080
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+    ports:
+      - "8090:8080"
+    depends_on:
+      - postgres_keycloak
+    restart: unless-stopped
+    networks:
+      - internal
 
 volumes:
   simulation_data:
+  keycloak_db:
+
+networks:
+  internal:
+    driver: bridge
 

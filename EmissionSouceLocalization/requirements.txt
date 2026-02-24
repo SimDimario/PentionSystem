@@ -7,4 +7,6 @@ scipy
 joblib
 fastapi
 uvicorn
+httpx
+python-jose
 

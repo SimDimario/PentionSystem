@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Depends
+from auth import verify_token
 import os
 import sys
 import numpy as np
@@ -31,7 +33,7 @@ class Spectra(BaseModel):
 app = FastAPI()
 
 @app.post("/predict_dnn")
-def predict_dnn(input_data: Spectra):
+def predict_dnn(input_data: Spectra,user=Depends(verify_token)):
     logger.info("Ricevuta richiesta su /predict_dnn")
     try:
         mass_spectrum = input_data.to_numpy()
@@ -56,7 +58,7 @@ def predict_dnn(input_data: Spectra):
 
 
 @app.post("/predict_brf")
-def predict_brf(input_data: Spectra):
+def predict_brf(input_data: Spectra,user=Depends(verify_token)):
     logger.info("Ricevuta richiesta su /predict_brf")
     try:
         mass_spectrum = input_data.to_numpy()

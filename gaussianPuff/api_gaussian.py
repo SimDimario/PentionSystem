@@ -1,10 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI,Depends
 import os, sys
 
 from pydantic import BaseModel, Field
 from typing import List, Tuple, Optional
 import logging
 import numpy as np
+from auth import verify_token
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from gaussianPuff.gaussianModel import run_dispersion_model
@@ -44,7 +45,7 @@ class Payload(BaseModel):
 app = FastAPI()
 
 @app.post("/start_simulation")
-def start_simulation(payload: dict):
+def start_simulation(payload: dict,user=Depends(verify_token)):
     logger.info("Ricevuta richiesta /start_simulation")
     try:
         raw_config = payload.get("config", {})

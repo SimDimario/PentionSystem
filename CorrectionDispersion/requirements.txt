@@ -11,4 +11,6 @@ windrose
 fastapi
 uvicorn
 python-multipart
+httpx
+python-jose
 

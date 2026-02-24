@@ -15,7 +15,9 @@ dependencies = [
 "folium",
 "branca",
 "fastapi",
-"uvicorn"
+"uvicorn",
+    "httpx",
+    "python-jose"
 
 ]
 

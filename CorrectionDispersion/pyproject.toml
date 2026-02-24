@@ -19,7 +19,9 @@ dependencies = [
 "windrose",
 "fastapi",
 "uvicorn",
-"python-multipart"
+"python-multipart",
+    "httpx",
+    "python-jose"
 ]
 
 

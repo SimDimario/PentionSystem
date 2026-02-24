@@ -17,7 +17,15 @@ dependencies = [
     "matplotlib",
     "streamlit-folium",
     "windrose",
-    "scipy"
+    "scipy",
+    "fastapi",
+    "uvicorn",
+    "python-jose",
+    "httpx",
+    "python-multipart",
+    "itsdangerous",
+    "starlette",
+    "streamlit-keycloak"
 ]
 
 

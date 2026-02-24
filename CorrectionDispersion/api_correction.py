@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from fastapi import FastAPI, Depends
+from auth import verify_token
 import numpy as np
 from typing import List, Optional
 import json
@@ -29,7 +31,7 @@ class DispersionInput(BaseModel):
     global_features: list | None = None
 
 @app.post("/generate_binary_map")
-def generate_map(bbox: BBox):
+def generate_map(bbox: BBox,user=Depends(verify_token)):
 
     quartiere_bbox = (bbox.min_lon, bbox.min_lat, bbox.max_lon, bbox.max_lat)
 
@@ -56,7 +58,7 @@ def generate_map(bbox: BBox):
     }
 
 @app.post("/correct_dispersion")
-def predict_endpoint(payload: DispersionInput):
+def predict_endpoint(payload: DispersionInput, user=Depends(verify_token)):
 
     conc_map = np.load(payload.concentration_map)
     build_map = np.load(payload.building_map)
