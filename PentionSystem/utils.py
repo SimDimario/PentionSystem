@@ -1,26 +1,31 @@
-import numpy as np
-import os
 import gc
+import os
+from datetime import datetime
+
+import numpy as np
+import requests
+
+
+OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
 
 nps_classes = [
-    'Cathinone analogues',
-    'Cannabinoid analogues',
-    'Phenethylamine analogues',
-    'Piperazine analogues',
-    'Tryptamine analogues',
-    'Fentanyl analogues'
+    "Cathinone analogues",
+    "Cannabinoid analogues",
+    "Phenethylamine analogues",
+    "Piperazine analogues",
+    "Tryptamine analogues",
+    "Fentanyl analogues",
 ]
+
 
 def random_position(free_cells):
     idx = np.random.choice(len(free_cells))
     y, x = free_cells[idx]
     return float(y), float(x)
 
+
 def clean_tmp_files():
-    tmp_files = [
-        "/tmp/C1.npy",
-        "/tmp/binary_map.npy"
-    ]
+    tmp_files = ["/tmp/C1.npy", "/tmp/binary_map.npy"]
 
     for f in tmp_files:
         try:
@@ -31,22 +36,13 @@ def clean_tmp_files():
 
     gc.collect()
 
-import requests
-from datetime import datetime
-
-OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
-
 
 def get_meteo(lat, lon):
     params = {
         "latitude": lat,
         "longitude": lon,
-        "hourly": [
-            "windspeed_10m",
-            "winddirection_10m",
-            "relativehumidity_2m"
-        ],
-        "timezone": "UTC"
+        "hourly": ["windspeed_10m", "winddirection_10m", "relativehumidity_2m"],
+        "timezone": "UTC",
     }
 
     response = requests.get(OPEN_METEO_URL, params=params)
@@ -59,16 +55,10 @@ def get_meteo(lat, lon):
     now = datetime.utcnow().replace(minute=0, second=0, microsecond=0)
 
     # parse robusto degli orari API
-    times = [
-        datetime.fromisoformat(t.replace("Z", ""))
-        for t in hourly["time"]
-    ]
+    times = [datetime.fromisoformat(t.replace("Z", "")) for t in hourly["time"]]
 
     # trova l’ora più vicina (niente ValueError)
-    time_index = min(
-        range(len(times)),
-        key=lambda i: abs(times[i] - now)
-    )
+    time_index = min(range(len(times)), key=lambda i: abs(times[i] - now))
 
     return {
         "wind_speed": hourly["windspeed_10m"][time_index],

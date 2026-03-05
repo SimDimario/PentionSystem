@@ -1,13 +1,27 @@
 import gc
+import logging
 import os
 import sys
 from collections import Counter
 import requests
+import streamlit as st
 from streamlit_folium import st_folium
+import numpy as np
 
 
-from plot_functions import *
-from utils import *
+from plot_functions import (
+    plot_binary_map,
+    plot_plan_view,
+    plot_wind_rose,
+    plot_dispersion_on_map,
+)
+from utils import (
+    get_meteo,
+    random_position,
+    nps_classes,
+    grid_index_to_coords,
+    clean_tmp_files,
+)
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if project_root not in sys.path:
@@ -15,6 +29,10 @@ if project_root not in sys.path:
 
 from gaussianPuff.Sensor import SensorSubstance, SensorAir
 from gaussianPuff.config import NPS, OutputType, DispersionModelType, ModelConfig
+
+
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 
 API_URL = "http://host.docker.internal:"
 
@@ -30,7 +48,9 @@ def run_application(payload):
     # --- Binary map generation
     status_text.text("Binary map generation...")
 
-    response = requests.post(f"{API_URL}8001/generate_binary_map", json=payload)
+    response = requests.post(
+        f"{API_URL}8001/generate_binary_map", json=payload, timeout=60
+    )
     if response.status_code != 200:
         st.error("Error in binary map generation.")
         return None
@@ -225,6 +245,7 @@ def run_application(payload):
     response_gauss = requests.post(
         f"{API_URL}8002/start_simulation",
         json={"config": param_gaussian_model.to_dict(), "bounds": bounds},
+        timeout=60,
     )
 
     print("risposta ottenuta")
@@ -298,7 +319,7 @@ def run_application(payload):
                     }
                 )
 
-    n_sensor_operating = ([s for s in sensors_substance if not s.is_fault]).__len__()
+    n_sensor_operating = len([s for s in sensors_substance if not s.is_fault])
 
     status_text.text("Start the prediction of the source...")
     response_loc = requests.post(
@@ -364,6 +385,7 @@ def run_application(payload):
     response_gauss = requests.post(
         f"{API_URL}8002/start_simulation",
         json={"config": param_gaussian_model.to_dict(), "bounds": bounds},
+        timeout=60,
     )
 
     if response_gauss.status_code != 200:
@@ -593,10 +615,10 @@ with weather_section:
     st.markdown("**⛅Meteo conditions**")
     weather_placeholder = st.empty()
     weather_placeholder.markdown(
-        f"💨 **Wind speed (m/s):** N/A  \n"
-        f"💨 **Wind type:** N/A  \n"
-        f"📈 **Stability:** N/A  \n"
-        f"♒︎ **Relative Humidity (%):** N/A"
+        "💨 **Wind speed (m/s):** N/A  \n"
+        "💨 **Wind type:** N/A  \n"
+        "📈 **Stability:** N/A  \n"
+        "♒︎ **Relative Humidity (%):** N/A"
     )
 
 with dispersion_section:
