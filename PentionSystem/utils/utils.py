@@ -1,21 +1,10 @@
 import gc
 import os
 from datetime import datetime
-
 import numpy as np
 import requests
 
-
-OPEN_METEO_URL = "https://api.open-meteo.com/v1/forecast"
-
-nps_classes = [
-    "Cathinone analogues",
-    "Cannabinoid analogues",
-    "Phenethylamine analogues",
-    "Piperazine analogues",
-    "Tryptamine analogues",
-    "Fentanyl analogues",
-]
+from config import OPEN_METEO_URL
 
 
 def random_position(free_cells):

@@ -158,3 +158,24 @@ Then, open the MLflow UI in your browser at [http://localhost:5000](http://local
   * remove unused files from images (articles, etc.) to make them lighter, so avoid "COPY . ." in the dockerfile
   * don't expose ports except the frontend one
   * give a hostname to each container that expose API for PentionSystem, this way you can avoid using <http://host.docker.internal>
+
+Application refactor keeping streamlit:
+
+```bash
+my_app/
+├── app.py                  # Entry point - just UI and routing
+├── core/
+│   ├── __init__.py
+│   └── logic.py            # Pure business logic (no Streamlit)
+├── services/
+│   ├── __init__.py
+│   └── service_logic.py    # code from gaussianPuff and other services, refactored to be inside the same container
+├── ui/
+│   ├── __init__.py
+│   ├── components.py       # reusable UI components
+│   └── state.py            # session_state management
+├── config.py               # Constants and configuration
+└── utils/
+    ├── __init__.py
+    └── helpers.py          # Utility functions
+```

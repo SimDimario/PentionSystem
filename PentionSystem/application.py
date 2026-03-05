@@ -1,5 +1,4 @@
 import gc
-import logging
 import os
 import sys
 from collections import Counter
@@ -8,17 +7,16 @@ import streamlit as st
 from streamlit_folium import st_folium
 import numpy as np
 
-
-from plot_functions import (
+from config import nps_classes, API_URL
+from utils.plot_functions import (
     plot_binary_map,
     plot_plan_view,
     plot_wind_rose,
     plot_dispersion_on_map,
 )
-from utils import (
+from utils.utils import (
     get_meteo,
     random_position,
-    nps_classes,
     grid_index_to_coords,
     clean_tmp_files,
 )
@@ -29,12 +27,6 @@ if project_root not in sys.path:
 
 from gaussianPuff.Sensor import SensorSubstance, SensorAir
 from gaussianPuff.config import NPS, OutputType, DispersionModelType, ModelConfig
-
-
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
-
-API_URL = "http://host.docker.internal:"
 
 
 def run_application(payload):
