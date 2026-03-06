@@ -49,6 +49,15 @@ services:
       - "8002:8002"
     restart: unless-stopped
 
+  random_sampling:
+    build:
+      context: ./SamplingService
+    image: random_sampling:latest
+    container_name: random_sampling
+    ports:
+      - "8005:8005"
+    restart: unless-stopped
+
   # source_localization:
   #   build:
   #     context: ./EmissionSourceLocalization
