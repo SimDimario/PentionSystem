@@ -2,9 +2,10 @@ import gc
 from collections import Counter
 import requests
 import streamlit as st
+from streamlit_folium import st_folium
 import numpy as np
 
-from config import nps_classes, API_URL
+from config import nps_classes, API_URL, DISPERSION_MAP_PATH
 from utils.plot_functions import (
     plot_binary_map,
     plot_plan_view,
@@ -12,7 +13,6 @@ from utils.plot_functions import (
     plot_dispersion_on_map,
 )
 from utils.utils import (
-    get_meteo,
     random_position,
     grid_index_to_coords,
 )
@@ -103,11 +103,7 @@ def run_application(
     lat_center = (payload["min_lat"] + payload["max_lat"]) / 2
     lon_center = (payload["min_lon"] + payload["max_lon"]) / 2
 
-    meteo = get_meteo(lat_center, lon_center)
-
     sensor_air = SensorAir(sensor_id=00, x=lon_center, y=lat_center, z=2.0)
-
-    # sensor_air = SensorAir(sensor_id=00, x=0.0, y=0.0, z=2.0)
     wind_speed, wind_type, stability_type, stability_value, humidify, dry_size, RH = (
         sensor_air.sample_meteorology()
     )
@@ -121,6 +117,7 @@ def run_application(
         )
 
     # --- Sensor substance
+    # TODO: remove in production, replace it with real data acquisition
     status_text.text("Air sampling...")
     sensors_substance = []
 
@@ -161,6 +158,8 @@ def run_application(
     status_text.text("NPS classification...")
     substance_nps = []
 
+    spectra_json = []
+    response_dnn = None
     if mass_spectrum:
         spectra_json = [m.tolist() for m in mass_spectrum]
         print(f"spectra_json: {type(spectra_json)}")
@@ -187,6 +186,7 @@ def run_application(
     print(type(substance_nps))
     print(len(substance_nps))
 
+    nps = None
     if substance_nps:
         most_common_substance = Counter(substance_nps).most_common(1)[0][0]
         print(most_common_substance)
@@ -396,13 +396,11 @@ def run_application(
     gauss_data = response_gauss.json()
     x_raw = gauss_data.get("x", [])
     y_raw = gauss_data.get("y", [])
-    times_raw = gauss_data.get("times", [])
     wind_dir_raw = gauss_data.get("wind_dir")
     C1_raw = gauss_data.get("concentration", [])
 
     x_grid = np.array(x_raw)
     y_grid = np.array(y_raw)
-    times = np.array(times_raw)
     wind_dir = np.array(wind_dir_raw)
     C1 = np.array(C1_raw)
 
@@ -445,8 +443,6 @@ def run_application(
     gc.collect()
     print(f"mapp finale {type(real_dispersion_map)}")
     print(real_dispersion_map.shape)
-    # progress += 20
-    # progress_bar.progress(progress)
 
     if real_dispersion_map.ndim == 3:
         # integrazione temporale (coerente con plot_plan_view)
@@ -454,9 +450,6 @@ def run_application(
         real_dispersion_map = np.trapezoid(tmp, axis=2)
         del tmp
         gc.collect()
-    # assert real_dispersion_map.ndim == 2
-
-    from streamlit_folium import st_folium
 
     if map_section is not None:
         m = plot_dispersion_on_map(
@@ -473,7 +466,7 @@ def run_application(
         st_folium(m, width=700, height=500)
         m.save("dispersion_map.html")
 
-        np.save("/tmp/dispersion.npy", real_dispersion_map)
+        np.save(DISPERSION_MAP_PATH, real_dispersion_map)
 
         st.session_state.simulation_results["dispersion_map"] = {
             "min_lat": payload["min_lat"],
@@ -484,7 +477,7 @@ def run_application(
                 {"id": s.id, "x": s.x, "y": s.y, "is_fault": s.is_fault}
                 for s in sensors_substance
             ],
-            "dispersion": "/tmp/dispersion.npy",
+            "dispersion": DISPERSION_MAP_PATH,
             "x_src": x,
             "y_src": y,
         }
@@ -497,7 +490,7 @@ def run_application(
     status_text.text("Simulation completed ✅")
     print("END")
 
-    np.save("/tmp/dispersion.npy", real_dispersion_map)
+    np.save(DISPERSION_MAP_PATH, real_dispersion_map)
 
     st.session_state.simulation_results.update(
         {

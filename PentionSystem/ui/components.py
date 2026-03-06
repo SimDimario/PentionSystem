@@ -1,5 +1,6 @@
 import streamlit as st
 
+from config import MIN_LAT, MIN_LON, MAX_LAT, MAX_LON
 from core.ui_invoked import start_button_logic, stop_button_logic, runtime_logic
 
 
@@ -55,11 +56,13 @@ def fixed_ui_init():
 
 def input_parameters_setup():
 
-    min_lat = st.sidebar.number_input("Min Lat", value=41.89, format="%.5f")
-    min_lon = st.sidebar.number_input("Min Lon", value=12.48, format="%.5f")
-    max_lat = st.sidebar.number_input("Max Lat", value=41.91, format="%.5f")
-    max_lon = st.sidebar.number_input("Max Lon", value=12.50, format="%.5f")
+    min_lat = st.sidebar.number_input("Min Lat", value=MIN_LAT, format="%.5f")
+    min_lon = st.sidebar.number_input("Min Lon", value=MIN_LON, format="%.5f")
+    max_lat = st.sidebar.number_input("Max Lat", value=MAX_LAT, format="%.5f")
+    max_lon = st.sidebar.number_input("Max Lon", value=MAX_LON, format="%.5f")
     place = st.sidebar.text_input("Place", value="Insert place name")
+
+    # TODO: remove in production
     n_sensors = st.sidebar.slider(
         "Number of sensors", min_value=5, max_value=50, value=10, step=1
     )
